@@ -1,7 +1,7 @@
 {
   "name": "connpass-analyzer",
   "version": "0.0.2",
-  "description": "",
+  "description": "connpass data analyzer for event organizer.",
   "main": "index.js",
   "scripts": {
     "test": "node examples/simple.js"
@@ -12,7 +12,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.19.0"
   }
