@@ -1,10 +1,14 @@
 {
   "name": "connpass-analyzer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "node examples/simple.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/n0bisuke/connpass-analyzer.git"
   },
   "keywords": [],
   "author": "",
