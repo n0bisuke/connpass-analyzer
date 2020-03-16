@@ -86,6 +86,15 @@ class Connpass {
         });
     }
 
+    // 検索イベント数
+    getSearchCount(){
+        return axios.get(this.group_url).then(res => {
+            const d = res.data.match(/  <h2 class="main_h2">検索結果 \((.*?)件\)<\/h2>/)[1];
+            // console.log(d);
+            return Number(d);
+        });
+    }
+
     // メソッド area()
     area() { return this.width * this.height; }
 
