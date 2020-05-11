@@ -7,8 +7,8 @@ const prefectures = ["hokkaido", "aomori", "iwate", "miyagi", "akita", "yamagata
 // const test = [ "online", "tokyo"];
 const test = [ "online"];
 
-let date = '2020/05/11';
-// const date = dateformat(new Date(), 'yyyy/mm/dd');
+// let date = '2020/05/11';
+let date = dateformat(new Date(), 'yyyy/mm/dd');
 // console.log(date);
 
 if (process.argv.length > 2){
@@ -27,7 +27,7 @@ if (process.argv.length > 2){
     // const URL = `https://connpass.com/search/?q=&start_from=` + encodeURIComponent(`${date}`) + `&start_to=` + encodeURIComponent(`${date}`) + `&prefectures=${prefectures[i]}&selectItem=${prefectures[i]}`;
     // console.log(URL);
 
-    const search = new Connpass(URL);
+    const search = new Connpass(URL,date);
 
     // cd.name = prefectures[i];
     cd.name = test[i];
