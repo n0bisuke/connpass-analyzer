@@ -5,8 +5,9 @@ const reducer = (accumulator, currentValue) => accumulator + currentValue;
 
 // class キーワードで Polygon を定義
 class Connpass {
-    constructor(group_url) {
+    constructor(group_url,date) {
       this.group_url = group_url;
+      this.date = date;
     }
 
     _get(){
@@ -124,7 +125,7 @@ class Connpass {
                 .forEach(lineWithIndex => {
                     const name = lineWithIndex[1].match(/      <p class="event_title"><a class="url summary" href=".*?">(.*?)<\/a><\/p>/)[1];
                     const url = lineWithIndex[1].match(/      <p class="event_title"><a class="url summary" href="(.*?)">.*?<\/a><\/p>/)[1];
-                    console.log(`${name}, ${url}`);
+                    console.log(`${this.date}, ${name}, ${url}`);
                 });
         });
     }
