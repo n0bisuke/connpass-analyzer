@@ -29,8 +29,6 @@
 ## sample
 
 ```js
-'use strict';
-
 const Connpass = require('connpass-analyzer');
 const groupname = 'iotlt';
 const community = new Connpass(`https://${groupname}.connpass.com/`);
