@@ -43,7 +43,6 @@ const community = new Connpass(`https://${groupname}.connpass.com/`);
     cd.event_count = await community.getEventCount(); //イベント総数
     cd.presentation = await community.getPresentationCount(); //プレゼン数
     cd.presentationPerEvent = cd.presentation / cd.event_count; //1回あたりの登壇数平均
-
     cd.next_events = await community.getNextEventsInfo(); //次回開催イベント情報
 
     cd.monthly_events = await community.getMonthlyHoldingsCount(); //月ごとの開催数
