@@ -1,12 +1,8 @@
 'use strict';
-//グループイベント件数
-const axios = require('axios');
+//グループイベント件数 from topPageHtml
 
-module.exports = (group_url) => {
-    return axios.get(group_url+'/event').then(res => {
-        const c = res.data.match(/<h3 class="title">イベント（(.*?)件）<\/h3>/)[1];
-        // console.log(c);
-        return Number(c);
-    });
+module.exports = (topPageHtml) => {
+    const c = topPageHtml.match(/">全てのイベントを見る（(.*?)件）<\/a>/)[1];
+    return Number(c);
 }
 

@@ -7,25 +7,83 @@ const getEventCount = require('./src/getEventCount.js');
 const getPresentationCount = require('./src/getPresentationCount.js');
 const getTotalMemberCount = require(`./src/getTotalMemberCount.js`);
 const getNextEventsInfo = require(`./src/getNextEventsInfo.js`);
+const getMonthlyHoldingsCount = require(`./src/getMonthlyHoldingsCount.js`);
+const getYearlyHoldingsCount = require(`./src/getYearlyHoldingsCount.js`);
+const getGroupId = require(`./src/getGroupId.js`);
+const _getAllEventPageHtml = require(`./src/_getAllEventPageHtml.js`);
+const _getTopPageHtml = require(`./src/_getTopPageHtml.js`);
+const _getAllEventInfo = require(`./src/_getAllEventInfo.js`);
 
 // class キーワードで Polygon を定義
 class Connpass {
     constructor(group_url,date) {
       this.group_url = group_url;
       this.date = date;
+      this.topPageHtml = '';
+      this.allPageHtml = '';
+      this.allEventsInfo = [];
+      this.monthlyHoldingsCount = {};
     }
     _get(){}
     
+    //グループID
+    getGroupId = async () => {
+        await this._fetchCheckTop();
+        return getGroupId(this.topPageHtml);
+    };
     //グループメンバー数
-    getUniqMemberCount = () => getUniqMemberCount(this.group_url);
+    getUniqMemberCount = async () => {
+        await this._fetchCheckTop();
+        return getUniqMemberCount(this.topPageHtml);
+    }
     //イベント開催数
-    getEventCount = () => getEventCount(this.group_url);
+    getEventCount = async () => {
+        await this._fetchCheckTop();
+        return getEventCount(this.topPageHtml);
+    }
     //登壇資料数
-    getPresentationCount = () => getPresentationCount(this.group_url);
-    //延べ参加人数
-    getTotalMemberCount = async () => getTotalMemberCount(this.group_url);
+    getPresentationCount = async () => {
+        await this._fetchCheckTop();
+        return getPresentationCount(this.topPageHtml);
+    };
     //次回開催イベント情報
-    getNextEventsInfo = () => getNextEventsInfo(this.group_url);
+    getNextEventsInfo = async () => {
+        await this._fetchCheckTop();   
+        return getNextEventsInfo(this.topPageHtml);
+    }
+    //月間開催数リスト
+    getMonthlyHoldingsCount = async () => {
+        await this._fetchCheckAll();
+        return getMonthlyHoldingsCount(this.allEventsInfo);
+    };
+    //年間開催数リスト
+    getYearlyHoldingsCount = async () => {
+        await this._fetchCheckAll();
+        return getYearlyHoldingsCount(this.allEventsInfo);
+    };
+    //延べ参加人数
+    getTotalMemberCount = async () => {
+        await this._fetchCheckAll();
+        return getTotalMemberCount(this.allEventsInfo);
+    };
+
+    _fetchCheckTop = async () => {
+        if(this.topPageHtml === ''){
+            this.topPageHtml = await _getTopPageHtml(this.group_url);
+        }
+    }
+
+    _fetchCheckAll = async () => {
+        if(this.allPageHtml === ''){
+            // debug用
+            // this.allPageHtml = await _getAllEventPageHtml(this.group_url, 26);
+            this.allPageHtml = await _getAllEventPageHtml(this.group_url); //全リストページ(connpass.com/event/?page=XX)のHTML
+        }
+
+        if(this.allEventsInfo.length === 0){
+            this.allEventsInfo = _getAllEventInfo(this.allPageHtml); //全イベント情報
+        }
+    }
 
     // 検索イベント数
     getSearchCount(){
