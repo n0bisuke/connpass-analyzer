@@ -6,9 +6,14 @@ module.exports = (topPageHtml) => {
     const html = topPageHtml.replace(/\r?\n/g,"");
     //次回イベントリスト
     const nextEventHtml = html.match(/<div class="open_event_area group_box">(.*?)<div class="group_box">/)[1];
-    const nextEventsHtmlArr = nextEventHtml.match(/class="group_event_list vevent clearfix"(.*?)<\/span>人/g);
-
+    let nextEventsHtmlArr = nextEventHtml.match(/class="group_event_list vevent clearfix"(.*?)<\/span>人/g);
+    if(nextEventsHtmlArr === null){
+        //connpassで募集しないイベントの場合
+        nextEventsHtmlArr = nextEventHtml.match(/class="title">次回イベント<\/h3>(.*?)<\/div><\/div>        <\/div>  <\/div>/g);
+    }
+    
     let resultData = [];
+
     for (let i = 0, len = nextEventsHtmlArr.length; i < len; i++) {
         resultData[i] = _getEventInfo(nextEventsHtmlArr[i]);          
     }

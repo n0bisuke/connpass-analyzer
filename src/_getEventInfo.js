@@ -6,8 +6,11 @@ module.exports = (html) => {
     let tmp = '';
     
     //参加人数
-    tmp  = html.match(/<span class="amount">(.*?)<\/span>/)[1];
-    c.currentAttendee = tmp.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'');
+    c.currentAttendee = '';
+    if(html.match(/<span class="amount">(.*?)<\/span>/)){
+        tmp  = html.match(/<span class="amount">(.*?)<\/span>/)[1];
+        c.currentAttendee = tmp.replace(/<("[^"]*"|'[^']*'|[^'">])*>/g,'');
+    }
 
     //参加可能上限人数
     if(html.match(/<\/span>\/(.*?)<\/span>人/)){
