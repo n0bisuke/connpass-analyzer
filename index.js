@@ -1,90 +1,88 @@
 'use strict';
 
 const axios = require('axios');
-const reducer = (accumulator, currentValue) => accumulator + currentValue;
+
+const getUniqMemberCount = require('./src/getUniqMemberCount.js');
+const getEventCount = require('./src/getEventCount.js');
+const getPresentationCount = require('./src/getPresentationCount.js');
+const getTotalMemberCount = require(`./src/getTotalMemberCount.js`);
+const getNextEventsInfo = require(`./src/getNextEventsInfo.js`);
+const getMonthlyHoldingsCount = require(`./src/getMonthlyHoldingsCount.js`);
+const getYearlyHoldingsCount = require(`./src/getYearlyHoldingsCount.js`);
+const getGroupId = require(`./src/getGroupId.js`);
+const _getAllEventPageHtml = require(`./src/_getAllEventPageHtml.js`);
+const _getTopPageHtml = require(`./src/_getTopPageHtml.js`);
+const _getAllEventInfo = require(`./src/_getAllEventInfo.js`);
 
 // class キーワードで Polygon を定義
 class Connpass {
     constructor(group_url,date) {
       this.group_url = group_url;
       this.date = date;
+      this.topPageHtml = '';
+      this.allPageHtml = '';
+      this.allEventsInfo = [];
+      this.monthlyHoldingsCount = {};
     }
-
-    _get(){
-
-    }
-
-    //グループメンバー数
-    getMemberCount(){
-        return axios.get(this.group_url).then(res => {
-            const c = res.data.match(/（<span class="amount">(.*?)<\/span>人）/)[1];
-            // console.log(c);
-            return Number(c);
-        });  
-    }
-
-    //イベント数
-    getEventCount(){
-        return axios.get(this.group_url+'/event').then(res => {
-            const c = res.data.match(/<h3 class="title">イベント（(.*?)件）<\/h3>/)[1];
-            // console.log(c);
-            return Number(c);
-        });
-    }
-
-    //登壇資料数
-    getPresentationCount(){
-        return axios.get(this.group_url+'/presentation').then(res => {
-            const c = res.data.match(/<h3 class="title">資料（(.*?)件）<\/h3>/)[1];
-            // console.log(c);
-            return Number(c);
-        });
-    }
-
-    //延べ参加人数
-    async getTotalPeople(page = 1, tmpdata = [], prev_count = []){
-        let c = 0;
-
-        while(1){
-            const res = await this._getPageTotalPeople(page);
-            tmpdata.push(res.c);
-
-            process.stdout.write('.');
-            // console.log(res.c, page, '|',prev_count.join(','), res.c_array.join(','));
+    _get(){}
     
-            if(prev_count.join(',') !== res.c_array.join(',')){//前回と同じ内容だったら終了
-                prev_count = res.c_array;
-                page++;
-                continue;
-            }else{
-                tmpdata.pop();
-                c = tmpdata.reduce(reducer);
-                // console.log(tmpdata, c);
-                break;
-            }
-       }
+    //グループID
+    getGroupId = async () => {
+        await this._fetchCheckTop();
+        return getGroupId(this.topPageHtml);
+    };
+    //グループメンバー数
+    getUniqMemberCount = async () => {
+        await this._fetchCheckTop();
+        return getUniqMemberCount(this.topPageHtml);
+    }
+    //イベント開催数
+    getEventCount = async () => {
+        await this._fetchCheckTop();
+        return getEventCount(this.topPageHtml);
+    }
+    //登壇資料数
+    getPresentationCount = async () => {
+        await this._fetchCheckTop();
+        return getPresentationCount(this.topPageHtml);
+    };
+    //次回開催イベント情報
+    getNextEventsInfo = async () => {
+        await this._fetchCheckTop();   
+        return getNextEventsInfo(this.topPageHtml);
+    }
+    //月間開催数リスト
+    getMonthlyHoldingsCount = async () => {
+        await this._fetchCheckAll();
+        return getMonthlyHoldingsCount(this.allEventsInfo);
+    };
+    //年間開催数リスト
+    getYearlyHoldingsCount = async () => {
+        await this._fetchCheckAll();
+        return getYearlyHoldingsCount(this.allEventsInfo);
+    };
+    //延べ参加人数
+    getTotalMemberCount = async () => {
+        await this._fetchCheckAll();
+        return getTotalMemberCount(this.allEventsInfo);
+    };
 
-       return c;
+    _fetchCheckTop = async () => {
+        if(this.topPageHtml === ''){
+            this.topPageHtml = await _getTopPageHtml(this.group_url);
+        }
     }
 
-    //延べ参加人数計測用 - ページごと
-    _getPageTotalPeople(page = 1){
-        const rule = `<span class="amount"><span( class="amount_over")?>(.*?)<\/span>\/`;
-        const regexp_g = new RegExp(rule, 'g');
-        const regexp = new RegExp(`>(.*?)<\/span>`);
+    _fetchCheckAll = async () => {
+        if(this.allPageHtml === ''){
+            // debug用
+            // this.allPageHtml = await _getAllEventPageHtml(this.group_url, 26);
+            this.allPageHtml = await _getAllEventPageHtml(this.group_url); //全リストページ(connpass.com/event/?page=XX)のHTML
+        }
 
-        return axios.get(`${this.group_url}/event?page=${page}`).then(res => {
-            const items = res.data.match(regexp_g);
-            const counts = items.map(item => {
-                const res = item.replace('<span class="amount"><span', '')
-                            .match(regexp)[1];
-                return Number(res);
-            });
-            const c = counts.reduce(reducer);
-            // console.log(items, counts);
-            // console.log(counts.reduce(reducer));
-            return {c:c, c_array:counts};
-        });
+        if(this.allEventsInfo.length === 0){
+            this.allEventsInfo = _getAllEventInfo(this.allPageHtml); //全イベント情報
+        }
     }
 
     // 検索イベント数
