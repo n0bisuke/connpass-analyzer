@@ -27,53 +27,53 @@ class Connpass {
     _get(){}
     
     //グループID
-    getGroupId = async () => {
+    async getGroupId() {
         await this._fetchCheckTop();
         return getGroupId(this.topPageHtml);
     };
     //グループメンバー数
-    getUniqMemberCount = async () => {
+    async getUniqMemberCount() {
         await this._fetchCheckTop();
         return getUniqMemberCount(this.topPageHtml);
     }
     //イベント開催数
-    getEventCount = async () => {
+    async getEventCount() {
         await this._fetchCheckTop();
         return getEventCount(this.topPageHtml);
     }
     //登壇資料数
-    getPresentationCount = async () => {
+    async getPresentationCount() {
         await this._fetchCheckTop();
         return getPresentationCount(this.topPageHtml);
     };
     //次回開催イベント情報
-    getNextEventsInfo = async () => {
+    async getNextEventsInfo() {
         await this._fetchCheckTop();   
         return getNextEventsInfo(this.topPageHtml);
     }
     //月間開催数リスト
-    getMonthlyHoldingsCount = async () => {
+    async getMonthlyHoldingsCount() {
         await this._fetchCheckAll();
         return getMonthlyHoldingsCount(this.allEventsInfo);
     };
     //年間開催数リスト
-    getYearlyHoldingsCount = async () => {
+    async getYearlyHoldingsCount() {
         await this._fetchCheckAll();
         return getYearlyHoldingsCount(this.allEventsInfo);
     };
     //延べ参加人数
-    getTotalMemberCount = async () => {
+    async getTotalMemberCount() {
         await this._fetchCheckAll();
         return getTotalMemberCount(this.allEventsInfo);
     };
 
-    _fetchCheckTop = async () => {
+    async _fetchCheckTop() {
         if(this.topPageHtml === ''){
             this.topPageHtml = await _getTopPageHtml(this.group_url);
         }
     }
 
-    _fetchCheckAll = async () => {
+    async _fetchCheckAll() {
         if(this.allPageHtml === ''){
             // debug用
             // this.allPageHtml = await _getAllEventPageHtml(this.group_url, 26);
