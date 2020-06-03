@@ -13,6 +13,8 @@ const getGroupId = require(`./src/getGroupId.js`);
 const _getAllEventPageHtml = require(`./src/_getAllEventPageHtml.js`);
 const _getTopPageHtml = require(`./src/_getTopPageHtml.js`);
 const _getAllEventInfo = require(`./src/_getAllEventInfo.js`);
+const getSearchCount = require(`./src/getSearchCount.js`); 
+const _getSearchCountPageHtml = require(`./src/_getSearchCountPageHtml.js`);
 
 // class キーワードで Polygon を定義
 class Connpass {
@@ -23,6 +25,7 @@ class Connpass {
       this.allPageHtml = '';
       this.allEventsInfo = [];
       this.monthlyHoldingsCount = {};
+      this.searchCountPageHtml = '';
     }
     _get(){}
     
@@ -86,33 +89,35 @@ class Connpass {
     }
 
     // 検索イベント数
-    getSearchCount(){
-        return axios.get(this.group_url).then(res => {
-            const d = res.data.match(/  <h2 class="main_h2">検索結果 \((.*?)件\)<\/h2>/)[1];
-            // console.log(d);
-            return Number(d);
-        });
+    async getSearchCount(){
+        await this._fetchSearchCount();
+        return getSearchCount(this.searchCountPageHtml);
+    }
+
+    async _fetchSearchCount() {
+        if(this.searchCountPageHtml === ''){
+            this.searchCountPageHtml = await _getSearchCountPageHtml(this.group_url);
+        }
     }
 
     // 検索イベントリスト表示
-    getSearchList(){
+    async getSearchList(){
         let page_num = 1;
-        return axios.get(this.group_url).then(res => {
-            const d = res.data.match(/  <h2 class="main_h2">検索結果 \((.*?)件\)<\/h2>/)[1];
-            // console.log(d);
-            if (Number(d) > 0) {
-                if (Number(d) > 10) {
-                    page_num = Math.floor(Number(d) / 10) + 1;
-                }
-                for (let i=1; i <= page_num; i++){
-                    this._getSearchList(i);
-                }
+        await this._fetchSearchCount();
+        const d = getSearchCount(this.searchCountPageHtml);
+        // console.log(d);
+        if (Number(d) > 0) {
+            if (Number(d) > 10) {
+                page_num = Math.floor(Number(d) / 10) + 1;
             }
-            return Number(d);
-        });
+            for (let i=1; i <= page_num; i++){
+                this._getSearchList(i);
+            }
+        }
+        return Number(d);
     }
 
-    _getSearchList(page){
+    async _getSearchList(page){
         return axios.get(`${this.group_url}&page=${page}`).then(res => {
             const lines = res.data.split(/\n/);
             const size = lines.length;
