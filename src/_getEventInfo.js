@@ -37,6 +37,7 @@ module.exports = (html) => {
     }
 
     c.url = html.match(/href="(.*?)"/)[1];
+    c.eventId = c.url.split('/')[4];
     c.imageUrl = html.match(/src="(.*?)"/)[1];
     
     return c;
