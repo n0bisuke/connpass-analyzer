@@ -15,6 +15,7 @@ const _getTopPageHtml = require(`./src/_getTopPageHtml.js`);
 const _getAllEventInfo = require(`./src/_getAllEventInfo.js`);
 const getSearchCount = require(`./src/getSearchCount.js`); 
 const _getSearchCountPageHtml = require(`./src/_getSearchCountPageHtml.js`);
+const getEventInfo = require(`./src/getEventInfo.js`);
 
 // class キーワードで Polygon を定義
 class Connpass {
@@ -53,6 +54,15 @@ class Connpass {
     async getNextEventsInfo() {
         await this._fetchCheckTop();   
         return getNextEventsInfo(this.topPageHtml);
+    }
+    //イベント情報
+    async getEventInfo(eventId) {
+        if(!eventId){
+            console.log('EventId is Required')
+            return;
+        }else{
+            return getEventInfo(eventId);
+        }
     }
     //月間開催数リスト
     async getMonthlyHoldingsCount() {

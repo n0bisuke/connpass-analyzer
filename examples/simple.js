@@ -26,5 +26,7 @@ const community = new Connpass(`https://${groupname}.connpass.com/`);
     cd.total_member = await community.getTotalMemberCount(); //述べ参加人数
     cd.new_rate = cd.uniq_member / cd.total_member; //新規率
 
+    cd.event = await community.getEventInfo(`173861`); //イベント情報
+
     console.log(cd);
 })();
